@@ -1,0 +1,1133 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HealthChef - Disease-Aware Indian Nutrition & Clinical Culinary AI</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="app-container">
+    
+    <!-- Top App Header -->
+    <header class="app-header" id="mainHeader">
+      <div class="header-left">
+        <button type="button" class="btn-back" id="btnHeaderBack" onclick="HealthChefApp.goBackSlide()" title="Back" style="display: none;">
+          ←
+        </button>
+        <div class="brand-wrapper">
+          <div class="brand-icon">🥗</div>
+          <div class="brand-title">HealthChef</div>
+        </div>
+      </div>
+      <div class="header-right">
+        <button type="button" class="btn-theme-toggle" id="btnThemeToggle" onclick="HealthChefApp.toggleTheme()" title="Switch Light/Dark Mode">
+          ☀️
+        </button>
+        <div class="user-badge-chip" id="headerUserChip" onclick="HealthChefApp.navigateToTab('tabProfile')" style="display: none;">
+          <span id="headerUserName">Rajesh</span> 👤
+        </div>
+      </div>
+    </header>
+
+    <!-- =========================================================================
+         SCREEN 1: DUAL AUTHENTICATION (#screenAuth)
+         ========================================================================= -->
+    <section class="screen active" id="screenAuth">
+      <div class="auth-hero">
+        <div class="auth-logo-badge">👨‍🍳</div>
+        <h1>Welcome to HealthChef</h1>
+        <p>Disease-aware Indian clinical nutrition, smart recipes, Ayurvedic nuske, and postoperative healing.</p>
+      </div>
+
+      <div class="auth-card">
+        <!-- Auth Method Selector Tabs -->
+        <div class="auth-tabs">
+          <button type="button" class="auth-tab-btn active" id="tabBtnPhone" onclick="HealthChefApp.switchAuthMethod('phone')">
+            📱 Phone (OTP)
+          </button>
+          <button type="button" class="auth-tab-btn" id="tabBtnEmail" onclick="HealthChefApp.switchAuthMethod('email')">
+            ✉️ Email ID
+          </button>
+        </div>
+
+        <!-- Phone Number Login Panel -->
+        <div class="auth-form-panel active" id="authPanelPhone">
+          <div class="form-group">
+            <label for="inputPhoneNumber">Indian Mobile Number (+91)</label>
+            <div class="phone-input-row">
+              <div class="country-code-pill">+91</div>
+              <input type="tel" id="inputPhoneNumber" maxlength="10" placeholder="98765 43210" pattern="[0-9]{10}" inputmode="numeric">
+            </div>
+          </div>
+
+          <button type="button" class="btn-primary" id="btnSendOtp" onclick="HealthChefApp.sendOtp()">
+            <span>Send 4-Digit OTP</span> ➔
+          </button>
+
+          <!-- 4-Box OTP Input (Initially Hidden until OTP is sent) -->
+          <div id="otpSection" style="display: none; margin-top: 18px;">
+            <label style="font-size: 0.85rem; font-weight: 600; color: var(--text-secondary);">
+              Enter 4-Digit Verification Code <span id="otpTimerDisplay" style="color: var(--accent-green); font-size: 0.8rem;">(Test OTP: 4321)</span>
+            </label>
+            <div class="otp-container">
+              <input type="text" maxlength="1" class="otp-box" id="otp1" inputmode="numeric" oninput="HealthChefApp.handleOtpInput(1, event)">
+              <input type="text" maxlength="1" class="otp-box" id="otp2" inputmode="numeric" oninput="HealthChefApp.handleOtpInput(2, event)">
+              <input type="text" maxlength="1" class="otp-box" id="otp3" inputmode="numeric" oninput="HealthChefApp.handleOtpInput(3, event)">
+              <input type="text" maxlength="1" class="otp-box" id="otp4" inputmode="numeric" oninput="HealthChefApp.handleOtpInput(4, event)">
+            </div>
+            <button type="button" class="btn-primary" id="btnVerifyOtp" onclick="HealthChefApp.verifyOtp()">
+              <span>Verify & Proceed</span> ✓
+            </button>
+          </div>
+        </div>
+
+        <!-- Email ID Login Panel -->
+        <div class="auth-form-panel" id="authPanelEmail">
+          <div class="form-group">
+            <label for="inputEmail">Email Address</label>
+            <input type="email" id="inputEmail" placeholder="name@example.com" autocomplete="email">
+          </div>
+          <div class="form-group">
+            <label for="inputPassword">Password</label>
+            <input type="password" id="inputPassword" placeholder="••••••••" autocomplete="current-password">
+          </div>
+          <button type="button" class="btn-primary" onclick="HealthChefApp.loginWithEmail()">
+            <span>Sign In / Register</span> ➔
+          </button>
+        </div>
+
+        <!-- Guest / Demo Mode One-Tap Bypass -->
+        <div style="margin-top: 20px; text-align: center;">
+          <div style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 8px;">— Or explore instantly without signing up —</div>
+          <button type="button" class="btn-guest-bypass" onclick="HealthChefApp.launchDemoMode()">
+            <span>⚡ One-Tap Guest / Demo Mode (Rajesh, 42 - Diabetes & BP)</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- =========================================================================
+         SCREEN 2: 5-STEP HEALTH ASSESSMENT ONBOARDING (#screenOnboarding)
+         ========================================================================= -->
+    <section class="screen" id="screenOnboarding">
+      <!-- 5-Step Progress Header -->
+      <div class="onboarding-stepper">
+        <div class="step-dot active" id="stepDot1">1</div>
+        <div class="step-line" id="stepLine1"></div>
+        <div class="step-dot" id="stepDot2">2</div>
+        <div class="step-line" id="stepLine2"></div>
+        <div class="step-dot" id="stepDot3">3</div>
+        <div class="step-line" id="stepLine3"></div>
+        <div class="step-dot" id="stepDot4">4</div>
+        <div class="step-line" id="stepLine4"></div>
+        <div class="step-dot" id="stepDot5">5</div>
+      </div>
+
+      <div class="onboarding-content-container">
+        
+        <!-- STEP 1: Clinical Introduction -->
+        <div class="onboarding-step-pane active" id="onboardStep1">
+          <h2 style="margin-bottom: 8px;">Disease-Aware Nutrition</h2>
+          <p style="font-size: 0.92rem; margin-bottom: 18px;">
+            Food is biological medicine. HealthChef customizes authentic Indian recipes, Ayurvedic remedies, and clinical macros specifically around your metabolism, blood markers, and digestive health.
+          </p>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px;">
+            <div style="background: var(--bg-tertiary); padding: 14px; border-radius: var(--radius-md); text-align: center;">
+              <div style="font-size: 1.8rem; margin-bottom: 4px;">🩸</div>
+              <strong style="font-size: 0.85rem; display: block;">Glycemic Control</strong>
+              <span style="font-size: 0.75rem; color: var(--text-tertiary);">Low GI millets & methi</span>
+            </div>
+            <div style="background: var(--bg-tertiary); padding: 14px; border-radius: var(--radius-md); text-align: center;">
+              <div style="font-size: 1.8rem; margin-bottom: 4px;">🫀</div>
+              <strong style="font-size: 0.85rem; display: block;">Cardio Protective</strong>
+              <span style="font-size: 0.75rem; color: var(--text-tertiary);">Air-fried & sodium smart</span>
+            </div>
+          </div>
+          <button type="button" class="btn-primary" onclick="HealthChefApp.nextOnboardStep(2)">
+            <span>Begin Assessment</span> ➔
+          </button>
+        </div>
+
+        <!-- STEP 2: Biometrics & Lifestyle -->
+        <div class="onboarding-step-pane" id="onboardStep2">
+          <h2 style="margin-bottom: 6px;">Biometrics & Lifestyle</h2>
+          <p style="font-size: 0.88rem; margin-bottom: 16px;">We compute your BMR, TDEE, and daily electrolyte targets.</p>
+          
+          <div class="form-group">
+            <label for="onboardName">Full Name</label>
+            <input type="text" id="onboardName" placeholder="e.g., Rajesh Sharma">
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+            <div class="form-group">
+              <label for="onboardAge">Age (Years)</label>
+              <input type="number" id="onboardAge" min="12" max="110" placeholder="42">
+            </div>
+            <div class="form-group">
+              <label for="onboardGender">Gender</label>
+              <select id="onboardGender">
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+            <div class="form-group">
+              <label for="onboardHeight">Height (cm)</label>
+              <input type="number" id="onboardHeight" min="100" max="250" placeholder="172">
+            </div>
+            <div class="form-group">
+              <label for="onboardWeight">Current Weight (kg)</label>
+              <input type="number" id="onboardWeight" min="30" max="250" placeholder="78">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="onboardActivity">Daily Activity Level</label>
+            <select id="onboardActivity">
+              <option value="Sedentary">Sedentary (Desk job, minimal exercise)</option>
+              <option value="Lightly Active">Lightly Active (Light walks 1-3 days/week)</option>
+              <option value="Moderately Active" selected>Moderately Active (Exercise 3-5 days/week)</option>
+              <option value="Very Active">Very Active (Heavy training/manual labor)</option>
+            </select>
+          </div>
+
+          <div class="onboarding-actions">
+            <button type="button" class="btn-secondary" onclick="HealthChefApp.prevOnboardStep(1)">Back</button>
+            <button type="button" class="btn-primary" onclick="HealthChefApp.nextOnboardStep(3)">Continue ➔</button>
+          </div>
+        </div>
+
+        <!-- STEP 3: Health Goals -->
+        <div class="onboarding-step-pane" id="onboardStep3">
+          <h2 style="margin-bottom: 6px;">Your Primary Health Goal</h2>
+          <p style="font-size: 0.88rem; margin-bottom: 14px;">Select what you want HealthChef to target.</p>
+
+          <div class="chip-grid" id="goalsChipGrid">
+            <div class="selectable-chip selected" onclick="HealthChefApp.selectSingleChip(this, 'onboardGoal')">📉 Lose weight</div>
+            <div class="selectable-chip" onclick="HealthChefApp.selectSingleChip(this, 'onboardGoal')">📈 Gain weight</div>
+            <div class="selectable-chip" onclick="HealthChefApp.selectSingleChip(this, 'onboardGoal')">⚖️ Maintain weight</div>
+            <div class="selectable-chip" onclick="HealthChefApp.selectSingleChip(this, 'onboardGoal')">💪 Build muscle</div>
+            <div class="selectable-chip" onclick="HealthChefApp.selectSingleChip(this, 'onboardGoal')">🌿 Eat healthier</div>
+          </div>
+
+          <div class="form-group" style="margin-top: 14px;">
+            <label for="onboardGoalWeight">Target Goal Weight (kg)</label>
+            <input type="number" id="onboardGoalWeight" min="35" max="200" placeholder="e.g., 72">
+            <small style="color: var(--text-tertiary); font-size: 0.78rem;">HealthChef computes daily calorie deficit/surplus automatically.</small>
+          </div>
+
+          <div class="onboarding-actions">
+            <button type="button" class="btn-secondary" onclick="HealthChefApp.prevOnboardStep(2)">Back</button>
+            <button type="button" class="btn-primary" onclick="HealthChefApp.nextOnboardStep(4)">Continue ➔</button>
+          </div>
+        </div>
+
+        <!-- STEP 4: Medical Conditions (Multi-select + Custom) -->
+        <div class="onboarding-step-pane" id="onboardStep4">
+          <h2 style="margin-bottom: 6px;">Medical Conditions</h2>
+          <p style="font-size: 0.88rem; margin-bottom: 12px;">Select all existing health parameters (multi-select):</p>
+
+          <div class="chip-grid" id="conditionsMultiGrid">
+            <div class="selectable-chip selected" onclick="HealthChefApp.toggleMultiCondition(this, 'Diabetes')">🩺 Diabetes (Type 1 / 2)</div>
+            <div class="selectable-chip selected" onclick="HealthChefApp.toggleMultiCondition(this, 'Hypertension')">🫀 Hypertension (High BP)</div>
+            <div class="selectable-chip" onclick="HealthChefApp.toggleMultiCondition(this, 'High Cholesterol')">🧈 High Cholesterol / Lipids</div>
+            <div class="selectable-chip" onclick="HealthChefApp.toggleMultiCondition(this, 'PCOS')">🌸 PCOS / PCOD</div>
+            <div class="selectable-chip" onclick="HealthChefApp.toggleMultiCondition(this, 'Anemia')">🩸 Anemia (Low Iron)</div>
+            <div class="selectable-chip" onclick="HealthChefApp.toggleMultiCondition(this, 'Thyroid concerns')">🦋 Thyroid concerns</div>
+            <div class="selectable-chip" onclick="HealthChefApp.toggleMultiCondition(this, 'None')">✨ None (General Wellness)</div>
+          </div>
+
+          <!-- Add Custom Condition Field -->
+          <div class="form-group" style="margin-top: 14px;">
+            <label for="inputCustomCondition">+ Add Custom Condition (e.g., Fatty Liver, GERD, Gout, Chronic Kidney)</label>
+            <div style="display: flex; gap: 8px;">
+              <input type="text" id="inputCustomCondition" placeholder="Type custom condition...">
+              <button type="button" class="btn-secondary" style="width: auto; padding: 0 16px;" onclick="HealthChefApp.addCustomCondition()">+ Add</button>
+            </div>
+            <div class="tag-list-display" id="customConditionsList" style="margin-top: 8px;"></div>
+          </div>
+
+          <!-- Clinical Notice Callout -->
+          <div class="clinical-notice-card">
+            <div>⚕️</div>
+            <div>
+              <strong>Clinical Clinical Safeguard Notice:</strong>
+              Recipes, macronutrients, and ingredient swaps are dynamically tuned to counteract insulin resistance, lipid elevation, and electrolyte strain. Always consult your attending physician before altering prescribed therapies.
+            </div>
+          </div>
+
+          <div class="onboarding-actions">
+            <button type="button" class="btn-secondary" onclick="HealthChefApp.prevOnboardStep(3)">Back</button>
+            <button type="button" class="btn-primary" onclick="HealthChefApp.nextOnboardStep(5)">Continue ➔</button>
+          </div>
+        </div>
+
+        <!-- STEP 5: Dietary Preferences & Safety -->
+        <div class="onboarding-step-pane" id="onboardStep5">
+          <h2 style="margin-bottom: 6px;">Dietary Preferences & Safety</h2>
+          <p style="font-size: 0.88rem; margin-bottom: 12px;">Customize your food boundaries and safety safeguards.</p>
+
+          <div class="form-group">
+            <label>Dietary Type</label>
+            <div class="chip-grid" id="dietTypeGrid">
+              <div class="selectable-chip selected" onclick="HealthChefApp.selectSingleChip(this, 'onboardDietType')">🥬 Vegetarian</div>
+              <div class="selectable-chip" onclick="HealthChefApp.selectSingleChip(this, 'onboardDietType')">🍗 Non-vegetarian</div>
+              <div class="selectable-chip" onclick="HealthChefApp.selectSingleChip(this, 'onboardDietType')">🌱 Vegan</div>
+              <div class="selectable-chip" onclick="HealthChefApp.selectSingleChip(this, 'onboardDietType')">🥚 Eggetarian</div>
+              <div class="selectable-chip" onclick="HealthChefApp.selectSingleChip(this, 'onboardDietType')">🙏 Jain (No root veg)</div>
+            </div>
+          </div>
+
+          <!-- Allergies Tag Input -->
+          <div class="form-group">
+            <label for="inputAllergy">Known Allergies (Type and tap Add)</label>
+            <div class="tag-input-container">
+              <input type="text" id="inputAllergy" placeholder="e.g., Peanuts, Gluten, Dairy, Shellfish, Soy">
+              <button type="button" class="btn-secondary" style="width: auto; padding: 0 16px;" onclick="HealthChefApp.addAllergyTag()">+ Add</button>
+            </div>
+            <div class="tag-list-display" id="allergiesTagList">
+              <span class="tag-chip">Peanuts <span class="tag-chip-remove" onclick="HealthChefApp.removeAllergyTag(this)">×</span></span>
+            </div>
+          </div>
+
+          <!-- Disliked Foods Tag Input -->
+          <div class="form-group">
+            <label for="inputDisliked">Disliked Foods (Optional)</label>
+            <div class="tag-input-container">
+              <input type="text" id="inputDisliked" placeholder="e.g., Karela, Bottle gourd, Mushroom">
+              <button type="button" class="btn-secondary" style="width: auto; padding: 0 16px;" onclick="HealthChefApp.addDislikedTag()">+ Add</button>
+            </div>
+            <div class="tag-list-display" id="dislikedTagList">
+              <span class="tag-chip">Karela <span class="tag-chip-remove" onclick="HealthChefApp.removeDislikedTag(this)">×</span></span>
+            </div>
+          </div>
+
+          <div class="onboarding-actions">
+            <button type="button" class="btn-secondary" onclick="HealthChefApp.prevOnboardStep(4)">Back</button>
+            <button type="button" class="btn-primary" onclick="HealthChefApp.completeOnboarding()">Complete & Launch 🚀</button>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- =========================================================================
+         SCREEN 3: MAIN APPLICATION SHELL & TABS (#screenApp)
+         ========================================================================= -->
+    <main class="screen" id="screenApp">
+      
+      <!-- TAB 1: HOME DASHBOARD (#tabHome) -->
+      <section class="tab-content active" id="tabHome">
+        <div class="greeting-header">
+          <div class="greeting-text">
+            <h2>Namaste, <span id="dashGreetingName">Rajesh</span>! 🙏</h2>
+            <p style="font-size: 0.85rem;" id="dashSubtitle">Today is optimal for balanced glycemic repair.</p>
+          </div>
+          <div class="goal-badge" id="dashGoalBadge">📉 Lose Weight</div>
+        </div>
+
+        <!-- Calorie & Macro Progress Card -->
+        <div class="calorie-macro-card">
+          <div class="calorie-header-row">
+            <div>
+              <div class="cal-number" id="dashNetCalories">1,240 <span style="font-size: 1rem; font-weight: 500; color: var(--text-tertiary);">kcal consumed</span></div>
+              <div class="cal-target" id="dashTargetCalories">Daily Target: 1,850 kcal (610 kcal remaining)</div>
+            </div>
+            <div style="font-size: 1.4rem; font-weight: 800; color: var(--accent-green);" id="dashCalPercentage">67%</div>
+          </div>
+          <div class="progress-bar-track">
+            <div class="progress-bar-fill" id="dashCalProgressBar" style="width: 67%;"></div>
+          </div>
+          <div class="macro-stats-row">
+            <div class="macro-stat-item">
+              <div class="macro-val" id="dashMacroProtein">68g</div>
+              <div class="macro-lbl">Protein (85g)</div>
+            </div>
+            <div class="macro-stat-item">
+              <div class="macro-val" id="dashMacroCarbs">142g</div>
+              <div class="macro-lbl">Carbs (190g)</div>
+            </div>
+            <div class="macro-stat-item">
+              <div class="macro-val" id="dashMacroFat">38g</div>
+              <div class="macro-lbl">Fat (45g)</div>
+            </div>
+            <div class="macro-stat-item">
+              <div class="macro-val" id="dashMacroMeals">3/4</div>
+              <div class="macro-lbl">Meals Logged</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Hands-Free CHEFFIE Shortcut Banner -->
+        <div class="nutrivoice-banner" onclick="HealthChefApp.openNutriVoiceModal()">
+          <div>
+            <div style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; opacity: 0.9;">Hands-Free Voice AI</div>
+            <div style="font-size: 1.15rem; font-weight: 800;">CHEFFIE Voice Assistant</div>
+            <div style="font-size: 0.82rem; opacity: 0.9; margin-top: 2px;">"Hey Cheffie, what can I eat for dinner with high cholesterol?"</div>
+          </div>
+          <div class="voice-mic-badge">🎙️</div>
+        </div>
+
+        <!-- Quick Action Grid -->
+        <div class="quick-action-grid">
+          <div class="quick-card" onclick="HealthChefApp.navigateToTab('tabRecipes')">
+            <div class="quick-card-icon">🍳</div>
+            <div class="quick-card-title">AI Recipe Studio</div>
+          </div>
+          <div class="quick-card" onclick="HealthChefApp.navigateToTab('tabPlanner')">
+            <div class="quick-card-icon">📅</div>
+            <div class="quick-card-title">7-Day Planner</div>
+          </div>
+          <div class="quick-card" onclick="HealthChefApp.navigateToTab('tabTrack')">
+            <div class="quick-card-icon">📊</div>
+            <div class="quick-card-title">Track & Vitals</div>
+          </div>
+        </div>
+
+        <!-- Wellness Pillars Overview -->
+        <h3 style="font-size: 1.05rem; margin-bottom: 10px;">Daily Wellness Pillars</h3>
+        <div class="wellness-pillars">
+          <div class="pillar-card">
+            <div class="pillar-icon">👟</div>
+            <div class="pillar-val" id="dashPillarSteps">6,240</div>
+            <div class="pillar-label">Steps / 8,000</div>
+          </div>
+          <div class="pillar-card">
+            <div class="pillar-icon">💧</div>
+            <div class="pillar-val" id="dashPillarWater">7 / 10</div>
+            <div class="pillar-label">Glasses</div>
+          </div>
+          <div class="pillar-card">
+            <div class="pillar-icon">🌙</div>
+            <div class="pillar-val" id="dashPillarSleep">7.5h</div>
+            <div class="pillar-label">Sleep Recorded</div>
+            <button type="button" class="btn-sleep-adder-mini" onclick="HealthChefApp.quickAddSleep30m()">+30m Boost</button>
+          </div>
+        </div>
+
+        <!-- Specialized Recovery Banners (Nuske & Surgery) -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px;">
+          <div class="quick-card" style="text-align: left; padding: 14px; background: var(--accent-amber-light); border-color: rgba(217, 119, 6, 0.3);" onclick="HealthChefApp.navigateToTab('tabNuske')">
+            <div style="font-size: 1.4rem; margin-bottom: 4px;">🌿</div>
+            <div style="font-size: 0.9rem; font-weight: 800; color: var(--accent-amber);">Desi "Nuske"</div>
+            <div style="font-size: 0.75rem; color: var(--text-secondary);">Ayurvedic alternatives to allopathy</div>
+          </div>
+          <div class="quick-card" style="text-align: left; padding: 14px; background: var(--accent-rose-light); border-color: rgba(225, 29, 72, 0.3);" onclick="HealthChefApp.navigateToTab('tabSurgery')">
+            <div style="font-size: 1.4rem; margin-bottom: 4px;">🏥</div>
+            <div style="font-size: 0.9rem; font-weight: 800; color: var(--accent-rose);">Surgery Recovery</div>
+            <div style="font-size: 0.75rem; color: var(--text-secondary);">Doctor-safe clinical meal phases</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 2: AI RECIPE STUDIO (#tabRecipes) -->
+      <section class="tab-content" id="tabRecipes">
+        <h2 style="margin-bottom: 4px;">AI Recipe Studio</h2>
+        <p style="font-size: 0.88rem; margin-bottom: 16px;">Generate disease-safe meals with zero-pantry support and hands-free voice dictation.</p>
+
+        <!-- Studio Control Box -->
+        <div class="studio-filter-box">
+          
+          <!-- Dual Language Cooking Tone Switcher -->
+          <div style="margin-bottom: 12px;">
+            <label style="font-size: 0.8rem; font-weight: 700; color: var(--text-secondary); margin-bottom: 4px; display: block;">
+              Cooking Tone & Narration Language
+            </label>
+            <div class="tone-lang-switch">
+              <button type="button" class="tone-lang-btn active" id="btnToneHinglish" onclick="HealthChefApp.setCookingTone('hinglish')">
+                🇮🇳 Desi Hinglish ("Ghar ka Khana")
+              </button>
+              <button type="button" class="tone-lang-btn" id="btnToneEnglish" onclick="HealthChefApp.setCookingTone('english')">
+                🇬🇧 Standard English
+              </button>
+            </div>
+          </div>
+
+          <!-- Parameters Filter Grid -->
+          <div class="filter-row">
+            <div class="filter-col">
+              <label for="recipeMealSelect">Meal Slot</label>
+              <select id="recipeMealSelect" onchange="HealthChefApp.onRecipeFilterChange()">
+                <option value="breakfast">Breakfast</option>
+                <option value="lunch" selected>Lunch</option>
+                <option value="snack">Evening Snack</option>
+                <option value="dinner">Dinner</option>
+              </select>
+            </div>
+            <div class="filter-col">
+              <label for="recipeCuisineSelect">Cuisine Style</label>
+              <select id="recipeCuisineSelect" onchange="HealthChefApp.onRecipeFilterChange()">
+                <option value="any">Any Indian / Global</option>
+                <option value="north indian" selected>North Indian</option>
+                <option value="south indian">South Indian (Dosa, Rasam...)</option>
+                <option value="continental">Continental</option>
+                <option value="asian">Asian</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="filter-row">
+            <div class="filter-col">
+              <label for="recipeCalorieSelect">Caloric Target</label>
+              <select id="recipeCalorieSelect">
+                <option value="any">Any Calorie Level</option>
+                <option value="low">Low Calorie (<350 kcal)</option>
+                <option value="balanced" selected>Balanced (350 - 600 kcal)</option>
+                <option value="high">High Calorie / Muscle (600+ kcal)</option>
+              </select>
+            </div>
+            <div class="filter-col">
+              <label for="recipeTimeSelect">Cooking Time</label>
+              <select id="recipeTimeSelect">
+                <option value="any" selected>Any Time</option>
+                <option value="15">15 Minutes Quick</option>
+                <option value="30">30 Minutes Standard</option>
+                <option value="45">45 Minutes Elaborate</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Interactive Ingredients & Zero-Pantry Tagger -->
+          <div class="form-group" style="margin-bottom: 12px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+              <label for="inputStudioIngredient" style="margin-bottom: 0;">Pantry Ingredients Available (Optional)</label>
+              <button type="button" class="btn-voice-mic" onclick="HealthChefApp.startVoiceDictation('inputStudioIngredient')" style="background: none; border: none; color: var(--accent-purple); font-size: 0.8rem; font-weight: 700;">
+                🎙️ Speak Ingredients
+              </button>
+            </div>
+            <div class="tag-input-container">
+              <input type="text" id="inputStudioIngredient" placeholder="Type ingredient (or leave empty for Zero-Pantry staples)">
+              <button type="button" class="btn-secondary" style="width: auto; padding: 0 16px;" onclick="HealthChefApp.addStudioIngredient()">+ Add</button>
+            </div>
+            <div class="tag-list-display" id="studioIngredientsList">
+              <!-- Default staple chips -->
+            </div>
+            <small style="color: var(--text-tertiary); font-size: 0.75rem; margin-top: 4px; display: block;">
+              💡 <strong>Zero-Pantry Mode:</strong> If no ingredients are entered, HealthChef automatically synthesizes balanced meals using wholesome Indian kitchen essentials.
+            </small>
+          </div>
+
+          <!-- Generate Multi-Recipes Button -->
+          <button type="button" class="btn-primary" onclick="HealthChefApp.generateRecipes()">
+            <span>✨ Generate 5 Personalized Clinical Options</span>
+          </button>
+        </div>
+
+        <!-- 5 Recipe Options Slider Tabs -->
+        <div class="recipe-options-tabs" id="recipeOptionTabsBar">
+          <button type="button" class="recipe-opt-tab active" onclick="HealthChefApp.switchRecipeOption(0)">Option 1</button>
+          <button type="button" class="recipe-opt-tab" onclick="HealthChefApp.switchRecipeOption(1)">Option 2</button>
+          <button type="button" class="recipe-opt-tab" onclick="HealthChefApp.switchRecipeOption(2)">Option 3</button>
+          <button type="button" class="recipe-opt-tab" onclick="HealthChefApp.switchRecipeOption(3)">Option 4</button>
+          <button type="button" class="recipe-opt-tab" onclick="HealthChefApp.switchRecipeOption(4)">Option 5</button>
+        </div>
+
+        <!-- Active Recipe Container -->
+        <div id="activeRecipeContainer">
+          <!-- Populated dynamically by JS -->
+        </div>
+
+      </section>
+
+      <!-- TAB 3: DAILY FOOD & NUTRIENT TRACKING (#tabTrack) -->
+      <section class="tab-content" id="tabTrack">
+        <h2 style="margin-bottom: 4px;">Daily Food & Vitals Track</h2>
+        <p style="font-size: 0.88rem; margin-bottom: 16px;">Real-time auto-recalculating meal logs, hydration, sleep, medications, and minerals.</p>
+
+        <!-- Meals Log with Instant Auto-Recalculating Dish Editor -->
+        <h3 style="font-size: 1.05rem; margin-bottom: 10px;">Today's Meals Log</h3>
+        
+        <div id="mealsLogContainer">
+          <!-- Breakfast, Lunch, Snack, Dinner Slot Cards rendered by JS -->
+        </div>
+
+        <!-- Hydration Tracking (10-Glass Grid) -->
+        <div class="hydration-box">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <h3 style="font-size: 1rem; display: flex; align-items: center; gap: 6px;">💧 Hydration Tracking</h3>
+            <span style="font-weight: 800; color: var(--accent-blue);" id="trackWaterDisplay">7 / 10 Glasses (1.75 L)</span>
+          </div>
+          <div class="glass-icon-grid" id="glassIconGrid">
+            <!-- 10 Interactive glass icons generated by JS -->
+          </div>
+          <div class="quick-log-row">
+            <button type="button" class="btn-secondary" onclick="HealthChefApp.adjustWater(1)">+1 Glass</button>
+            <button type="button" class="btn-secondary" onclick="HealthChefApp.adjustWater(2)">+2 Glasses</button>
+            <button type="button" class="btn-secondary" onclick="HealthChefApp.adjustWater(-1)">-1</button>
+          </div>
+        </div>
+
+        <!-- Sleep Schedule & +30m Dynamic Adder -->
+        <div class="sleep-box">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+            <h3 style="font-size: 1rem; display: flex; align-items: center; gap: 6px;">🌙 Sleep Schedule & Duration</h3>
+            <button type="button" class="btn-sleep-adder-mini" onclick="HealthChefApp.add30mSleepCustom()">+30m Sleep Adder</button>
+          </div>
+          <div class="filter-row">
+            <div class="filter-col">
+              <label for="trackBedtimeSelect">Bedtime Schedule</label>
+              <select id="trackBedtimeSelect" onchange="HealthChefApp.saveSleepSchedule()">
+                <option value="10:30 PM - 06:30 AM">10:30 PM - 06:30 AM (8h)</option>
+                <option value="11:00 PM - 06:30 AM" selected>11:00 PM - 06:30 AM (7.5h)</option>
+                <option value="11:30 PM - 07:00 AM">11:30 PM - 07:00 AM (7.5h)</option>
+                <option value="12:00 AM - 07:30 AM">12:00 AM - 07:30 AM (7.5h)</option>
+              </select>
+            </div>
+            <div class="filter-col">
+              <label for="trackSleepDurationSelect">Recorded Duration</label>
+              <select id="trackSleepDurationSelect" onchange="HealthChefApp.saveSleepDuration()">
+                <option value="6.0">6.0 hrs</option>
+                <option value="6.5">6.5 hrs</option>
+                <option value="7.0">7.0 hrs</option>
+                <option value="7.5" selected>7.5 hrs</option>
+                <option value="8.0">8.0 hrs</option>
+                <option value="8.5">8.5 hrs</option>
+                <option value="9.0">9.0 hrs</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Workout & Physical Activity Tracker -->
+        <div class="studio-filter-box" style="margin-bottom: 18px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+            <h3 style="font-size: 1rem;">🏃 Workouts & Calorie Burn</h3>
+            <span style="font-size: 0.85rem; font-weight: 700; color: var(--accent-orange);" id="totalCaloriesBurned">140 kcal burned</span>
+          </div>
+          <!-- Presets -->
+          <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px;">
+            <button type="button" class="btn-secondary" style="font-size: 0.8rem; padding: 6px 10px;" onclick="HealthChefApp.logPresetWorkout('Brisk Walk', 30, 140)">
+              👟 Brisk Walk (30m, 140 kcal)
+            </button>
+            <button type="button" class="btn-secondary" style="font-size: 0.8rem; padding: 6px 10px;" onclick="HealthChefApp.logPresetWorkout('Hatha Yoga', 25, 110)">
+              🧘 Hatha Yoga (25m, 110 kcal)
+            </button>
+            <button type="button" class="btn-secondary" style="font-size: 0.8rem; padding: 6px 10px;" onclick="HealthChefApp.logPresetWorkout('Strength Training', 35, 210)">
+              🏋️ Strength (35m, 210 kcal)
+            </button>
+          </div>
+          <!-- Custom Workout Form -->
+          <div style="display: grid; grid-template-columns: 2fr 1fr 1fr auto; gap: 6px; align-items: end;">
+            <div>
+              <label style="font-size: 0.75rem;">Custom Activity</label>
+              <input type="text" id="customWorkoutName" placeholder="e.g., Cycling">
+            </div>
+            <div>
+              <label style="font-size: 0.75rem;">Minutes</label>
+              <input type="number" id="customWorkoutMins" placeholder="30">
+            </div>
+            <div>
+              <label style="font-size: 0.75rem;">Burn (kcal)</label>
+              <input type="number" id="customWorkoutKcal" placeholder="150">
+            </div>
+            <button type="button" class="btn-primary" style="height: 42px; width: auto; padding: 0 14px;" onclick="HealthChefApp.logCustomWorkout()">
+              + Log
+            </button>
+          </div>
+          <!-- History List -->
+          <div id="workoutHistoryList" style="margin-top: 12px;">
+            <!-- Rendered by JS -->
+          </div>
+        </div>
+
+        <!-- Medications & Daily Clinical Routine -->
+        <div class="studio-filter-box" style="margin-bottom: 18px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+            <h3 style="font-size: 1rem;">💊 Medications & Supplements</h3>
+            <button type="button" class="btn-secondary" style="width: auto; padding: 5px 12px; font-size: 0.8rem;" onclick="HealthChefApp.openAddMedicineModal()">
+              + Add Medicine
+            </button>
+          </div>
+          <div id="medicationsList">
+            <!-- Rendered by JS with dosage, timings, relations, reminders, check-offs -->
+          </div>
+        </div>
+
+        <!-- Other Activities Done Section -->
+        <div class="studio-filter-box" style="margin-bottom: 18px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+            <h3 style="font-size: 1rem;">🧘 Other Wellness Activities Done</h3>
+            <button type="button" class="btn-secondary" style="width: auto; padding: 5px 12px; font-size: 0.8rem;" onclick="HealthChefApp.addOtherActivityPrompt()">
+              + Log Activity
+            </button>
+          </div>
+          <div id="otherActivitiesList">
+            <!-- Pranayama, Meditation, Physiotherapy checkoffs -->
+          </div>
+        </div>
+
+        <!-- Micronutrients & Minerals Tracker (Fe, Ca, Na) -->
+        <h3 style="font-size: 1.05rem; margin-bottom: 10px;">Micronutrients & Clinical Mineral Safety</h3>
+        <div class="micronutrients-grid">
+          <div class="micro-card">
+            <div class="micro-symbol">Fe (Iron)</div>
+            <div class="micro-val" id="microValFe">14.8 mg</div>
+            <div class="clinical-badge optimal" id="microBadgeFe">Optimal Range</div>
+            <div style="font-size: 0.7rem; color: var(--text-tertiary); margin-top: 4px;">RDA: 14 - 18 mg</div>
+          </div>
+          <div class="micro-card">
+            <div class="micro-symbol">Ca (Calcium)</div>
+            <div class="micro-val" id="microValCa">780 mg</div>
+            <div class="clinical-badge optimal" id="microBadgeCa">Safe Zone</div>
+            <div style="font-size: 0.7rem; color: var(--text-tertiary); margin-top: 4px;">RDA: 800 - 1000 mg</div>
+          </div>
+          <div class="micro-card">
+            <div class="micro-card-na">
+              <div class="micro-symbol">Na (Sodium)</div>
+              <div class="micro-val" id="microValNa">1,420 mg</div>
+              <div class="clinical-badge optimal" id="microBadgeNa">BP Safe (&lt;2000)</div>
+              <div style="font-size: 0.7rem; color: var(--text-tertiary); margin-top: 4px;">Clinical Cap: 2000 mg</div>
+            </div>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- TAB 4: 7-DAY MEAL PLANNER & PROGRESS (#tabPlanner) -->
+      <section class="tab-content" id="tabPlanner">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+          <h2>7-Day Meal Planner</h2>
+          <button type="button" class="btn-primary" style="width: auto; padding: 6px 12px; font-size: 0.8rem;" onclick="HealthChefApp.generateFullDayPlan()">
+            ✨ All-Day Simultaneous Regen
+          </button>
+        </div>
+        <p style="font-size: 0.88rem; margin-bottom: 16px;">Tailored meal structure with single-meal regeneration and dynamic grocery list.</p>
+
+        <!-- 30-Day Weight Sparkline & Trend Card -->
+        <div class="sparkline-wrapper">
+          <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px;">
+            <div>
+              <span style="font-size: 0.85rem; font-weight: 700; color: var(--text-secondary);">30-Day Weight Trajectory</span>
+              <div style="font-size: 1.4rem; font-weight: 800; color: var(--accent-green);">
+                <span id="planCurrentWeightDisplay">78.0 kg</span> <span style="font-size: 0.85rem; font-weight: 500; color: var(--text-tertiary);">→ Target: <span id="planTargetWeightDisplay">72.0 kg</span></span>
+              </div>
+            </div>
+            <button type="button" class="btn-secondary" style="width: auto; padding: 4px 8px; font-size: 0.75rem;" onclick="HealthChefApp.promptUpdateGoalWeight()">
+              ✏️ Set Goal Weight
+            </button>
+          </div>
+          <!-- SVG Sparkline -->
+          <div id="weightSparklineSvgContainer" style="width: 100%; height: 90px; margin: 10px 0;">
+            <!-- SVG rendered dynamically by JS -->
+          </div>
+          <div style="display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--text-tertiary);">
+            <span id="planDay1WeightDisplay">Day 1 (80.5 kg)</span>
+            <span id="planDay15WeightDisplay">Day 15 (79.2 kg)</span>
+            <span id="planTodayWeightDisplay">Today (78.0 kg)</span>
+            <span id="planGoalWeightFooterDisplay">Target (72.0 kg)</span>
+          </div>
+        </div>
+
+        <!-- Day Selector Tabs (Monday through Sunday) -->
+        <div class="day-selector-pills" id="plannerDayPills">
+          <button type="button" class="day-pill-btn active" onclick="HealthChefApp.switchPlannerDay('Monday')">Mon</button>
+          <button type="button" class="day-pill-btn" onclick="HealthChefApp.switchPlannerDay('Tuesday')">Tue</button>
+          <button type="button" class="day-pill-btn" onclick="HealthChefApp.switchPlannerDay('Wednesday')">Wed</button>
+          <button type="button" class="day-pill-btn" onclick="HealthChefApp.switchPlannerDay('Thursday')">Thu</button>
+          <button type="button" class="day-pill-btn" onclick="HealthChefApp.switchPlannerDay('Friday')">Fri</button>
+          <button type="button" class="day-pill-btn" onclick="HealthChefApp.switchPlannerDay('Saturday')">Sat</button>
+          <button type="button" class="day-pill-btn" onclick="HealthChefApp.switchPlannerDay('Sunday')">Sun</button>
+        </div>
+
+        <!-- Active Day Meal Slots (Breakfast, Lunch, Snack, Dinner) with Single-Meal Regen -->
+        <div id="plannerDayMealsContainer">
+          <!-- Rendered by JS -->
+        </div>
+
+        <!-- Weekly Health Summary Card -->
+        <div class="studio-filter-box" style="margin-top: 18px;">
+          <h3 style="font-size: 1rem; margin-bottom: 8px;">Weekly Health Summary Achievements</h3>
+          <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; text-align: center;">
+            <div style="background: var(--bg-tertiary); padding: 10px; border-radius: var(--radius-sm);">
+              <div style="font-size: 1.1rem; font-weight: 800; color: var(--accent-blue);">94%</div>
+              <div style="font-size: 0.72rem; color: var(--text-tertiary);">Hydration Target</div>
+            </div>
+            <div style="background: var(--bg-tertiary); padding: 10px; border-radius: var(--radius-sm);">
+              <div style="font-size: 1.1rem; font-weight: 800; color: var(--accent-green);">7,420</div>
+              <div style="font-size: 0.72rem; color: var(--text-tertiary);">Avg Daily Steps</div>
+            </div>
+            <div style="background: var(--bg-tertiary); padding: 10px; border-radius: var(--radius-sm);">
+              <div style="font-size: 1.1rem; font-weight: 800; color: var(--accent-purple);">-18%</div>
+              <div style="font-size: 0.72rem; color: var(--text-tertiary);">Sodium Intake</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Interactive Grocery List Generator -->
+        <div class="grocery-checklist-box">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+            <h3 style="font-size: 1rem;">🛒 7-Day Grocery Checklist</h3>
+            <button type="button" class="btn-secondary" style="width: auto; padding: 4px 10px; font-size: 0.75rem;" onclick="HealthChefApp.copyGroceryList()">
+              📋 Copy to Clipboard
+            </button>
+          </div>
+          <div id="groceryChecklistContainer">
+            <!-- Checkbox list dynamically populated from planned meals -->
+          </div>
+        </div>
+
+      </section>
+
+      <!-- TAB 5: "NUSKE" - AYURVEDIC ALTERNATIVES TO ALOPATHY (#tabNuske) -->
+      <section class="tab-content" id="tabNuske">
+        <h2 style="margin-bottom: 4px;">Desi "Nuske" Hub 🌿</h2>
+        <p style="font-size: 0.88rem; margin-bottom: 16px;">
+          Time-tested Indian Ayurvedic and kitchen remedies as safe, natural alternatives to routine allopathy.
+        </p>
+
+        <!-- Search Bar with Voice Search -->
+        <div style="display: flex; gap: 8px; margin-bottom: 14px;">
+          <input type="text" id="inputNuskeSearch" placeholder="Search remedy for gas, acidity, cough, BP..." oninput="HealthChefApp.filterNuske()">
+          <button type="button" class="btn-secondary" style="width: auto; padding: 0 14px;" onclick="HealthChefApp.startVoiceDictation('inputNuskeSearch', () => HealthChefApp.filterNuske())" title="Voice Search">
+            🎙️
+          </button>
+        </div>
+
+        <!-- Category Filters -->
+        <div class="day-selector-pills" id="nuskeCategoryPills">
+          <button type="button" class="day-pill-btn active" onclick="HealthChefApp.filterNuskeCategory('all')">All Remedies</button>
+          <button type="button" class="day-pill-btn" onclick="HealthChefApp.filterNuskeCategory('Digestion')">Digestion & Gas</button>
+          <button type="button" class="day-pill-btn" onclick="HealthChefApp.filterNuskeCategory('Acidity')">Acidity / GERD</button>
+          <button type="button" class="day-pill-btn" onclick="HealthChefApp.filterNuskeCategory('Respiratory')">Cough & Throat</button>
+          <button type="button" class="day-pill-btn" onclick="HealthChefApp.filterNuskeCategory('Cardiac')">Heart & BP</button>
+          <button type="button" class="day-pill-btn" onclick="HealthChefApp.filterNuskeCategory('Joints')">Joints & Pain</button>
+          <button type="button" class="day-pill-btn" onclick="HealthChefApp.filterNuskeCategory('Women\'s Health')">PCOS & Cramps</button>
+        </div>
+
+        <!-- Remedies List Container -->
+        <div id="nuskeListContainer">
+          <!-- Populated from NUSKE_REPOSITORY -->
+        </div>
+      </section>
+
+      <!-- TAB 6: POST-SURGERY RECOVERY MEAL GENERATOR (#tabSurgery) -->
+      <section class="tab-content" id="tabSurgery">
+        <h2 style="margin-bottom: 4px;">Post-Surgery Clinical Recovery Care 🏥</h2>
+        <p style="font-size: 0.88rem; margin-bottom: 16px;">
+          Physician-safe nutrition formulated for tissue regeneration, digestive gentleness, and zero wound inflammation.
+        </p>
+
+        <!-- Surgery Intake Form with Hands-Free Voice Dictation -->
+        <div class="surgery-form-box">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+            <label style="font-weight: 700; font-size: 0.9rem; color: var(--text-primary);">Surgical Procedure Details</label>
+            <button type="button" class="btn-voice-mic" onclick="HealthChefApp.startSurgeryVoiceDictation()" style="background: none; border: none; color: var(--accent-purple); font-size: 0.82rem; font-weight: 700;">
+              🎙️ Hands-Free Voice Dictation
+            </button>
+          </div>
+
+          <div class="form-group">
+            <label for="surgeryNameInput">Surgery Name</label>
+            <input type="text" id="surgeryNameInput" placeholder="e.g., Gallbladder removal (Cholecystectomy), C-Section, Cardiac stent, Hernia, Orthopedic">
+          </div>
+
+          <div class="filter-row">
+            <div class="filter-col">
+              <label for="surgeryTimelineSelect">When was it performed?</label>
+              <select id="surgeryTimelineSelect">
+                <option value="day 1-3">Day 1 to 3 (Immediate Post-Op)</option>
+                <option value="day 4-7" selected>Day 4 to 7 (Early Healing)</option>
+                <option value="week 2-4">Week 2 to 4 (Active Recovery)</option>
+                <option value="1-3 months">1 to 3 Months (Consolidation)</option>
+              </select>
+            </div>
+            <div class="filter-col">
+              <label for="surgeryDigestiveStatus">Current Bowel/Digestive State</label>
+              <select id="surgeryDigestiveStatus">
+                <option value="Normal">Normal passed gas</option>
+                <option value="Nausea / Fragile" selected>Nausea / Fragile gut</option>
+                <option value="Constipated">Constipated / Sluggish</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="surgeryDoctorAdviceInput">Doctor's Specific Instructions / Advised Restrictions</label>
+            <textarea id="surgeryDoctorAdviceInput" rows="3" placeholder="e.g., Doctor advised strictly no oil or dairy for 3 weeks, high liquid intake, avoid raw salad..."></textarea>
+          </div>
+
+          <button type="button" class="btn-primary" onclick="HealthChefApp.generateSurgeryRecoveryDiet()">
+            <span>✨ Formulate Post-Surgery Recovery Menu</span>
+          </button>
+        </div>
+
+        <!-- Generated Recovery Diet Display Container -->
+        <div id="surgeryPlanDisplayContainer">
+          <!-- Populated by JS -->
+        </div>
+      </section>
+
+      <!-- TAB 7: PROFILE & CLINICAL SETTINGS (#tabProfile) -->
+      <section class="tab-content" id="tabProfile">
+        <h2 style="margin-bottom: 4px;">User Profile & Clinical Settings</h2>
+        <p style="font-size: 0.88rem; margin-bottom: 16px;">Manage biometrics, dedicated allergy card, Gemini API key, and data persistence.</p>
+
+        <!-- Biometrics Overview Card -->
+        <div class="profile-card">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+            <div>
+              <h3 style="font-size: 1.15rem;" id="profileUserName">Rajesh Sharma</h3>
+              <span style="font-size: 0.8rem; color: var(--text-tertiary);" id="profileUserAuthDetails">Phone: +91 98765 43210</span>
+            </div>
+            <span class="goal-badge" id="profileGoalBadge">📉 Lose Weight</span>
+          </div>
+          <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; text-align: center; background: var(--bg-tertiary); padding: 10px; border-radius: var(--radius-md);">
+            <div>
+              <div style="font-weight: 800; font-size: 0.95rem;" id="profileAge">42</div>
+              <div style="font-size: 0.7rem; color: var(--text-tertiary);">Age</div>
+            </div>
+            <div>
+              <div style="font-weight: 800; font-size: 0.95rem;" id="profileGender">Male</div>
+              <div style="font-size: 0.7rem; color: var(--text-tertiary);">Gender</div>
+            </div>
+            <div>
+              <div style="font-weight: 800; font-size: 0.95rem;" id="profileHeight">172 cm</div>
+              <div style="font-size: 0.7rem; color: var(--text-tertiary);">Height</div>
+            </div>
+            <div>
+              <div style="font-weight: 800; font-size: 0.95rem;" id="profileWeight">78 kg</div>
+              <div style="font-size: 0.7rem; color: var(--text-tertiary);">Weight</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Dedicated Allergies & Safety Card -->
+        <div class="profile-card">
+          <h3 style="font-size: 1rem; margin-bottom: 8px; color: var(--accent-rose);">⚠️ Dedicated Allergies & Food Safety</h3>
+          <div style="margin-bottom: 10px;">
+            <label style="font-size: 0.8rem; font-weight: 700; color: var(--text-secondary);">Active Allergies Logged:</label>
+            <div class="tag-list-display" id="profileAllergiesDisplay" style="margin-top: 4px;">
+              <!-- Rendered by JS -->
+            </div>
+          </div>
+          <div>
+            <label style="font-size: 0.8rem; font-weight: 700; color: var(--text-secondary);">Disliked Ingredients:</label>
+            <div class="tag-list-display" id="profileDislikedDisplay" style="margin-top: 4px;">
+              <!-- Rendered by JS -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Active Clinical Conditions Card -->
+        <div class="profile-card">
+          <h3 style="font-size: 1rem; margin-bottom: 8px;">🩺 Active Health Parameters</h3>
+          <div class="tag-list-display" id="profileConditionsDisplay">
+            <!-- Rendered by JS -->
+          </div>
+        </div>
+
+        <!-- Retake Health Assessment Action -->
+        <div class="profile-card" style="text-align: center;">
+          <h3 style="font-size: 1rem; margin-bottom: 4px;">Update Health Parameters?</h3>
+          <p style="font-size: 0.85rem; margin-bottom: 12px;">You can retake the 5-step clinical onboarding at any time without clearing your account history.</p>
+          <button type="button" class="btn-secondary" onclick="HealthChefApp.retakeAssessment()">
+            🔄 Retake 5-Step Health Assessment
+          </button>
+        </div>
+
+        <!-- Direct Gemini API Network Integration Settings -->
+        <div class="profile-card">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+            <h3 style="font-size: 1rem;">🤖 Direct Gemini API Integration</h3>
+            <span class="clinical-badge optimal" id="geminiStatusBadge">Offline Knowledge Engine Active</span>
+          </div>
+          <p style="font-size: 0.82rem; margin-bottom: 12px;">
+            HealthChef runs 100% autonomously offline with its built-in clinical database. Optionally plug in your Google Gemini API key to enable live LLM generation.
+          </p>
+          <div class="form-group">
+            <label for="inputGeminiApiKey">Gemini API Key</label>
+            <input type="password" id="inputGeminiApiKey" placeholder="AIzaSy...">
+          </div>
+          <div style="display: flex; gap: 8px;">
+            <button type="button" class="btn-primary" style="width: auto; padding: 8px 16px; font-size: 0.85rem;" onclick="HealthChefApp.saveGeminiApiKey()">
+              Save API Key
+            </button>
+            <button type="button" class="btn-secondary" style="width: auto; padding: 8px 16px; font-size: 0.85rem;" onclick="HealthChefApp.testGeminiConnection()">
+              Test Live Call
+            </button>
+          </div>
+        </div>
+
+        <!-- Account Sign Out & Storage Reset -->
+        <div style="display: flex; gap: 10px; margin-top: 10px;">
+          <button type="button" class="btn-secondary" style="color: var(--accent-rose); border-color: rgba(225, 29, 72, 0.3);" onclick="HealthChefApp.logoutUser()">
+            🚪 Sign Out
+          </button>
+          <button type="button" class="btn-secondary" onclick="HealthChefApp.exportUserData()">
+            💾 Backup JSON
+          </button>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- =========================================================================
+         5-TAB BOTTOM NAVIGATION DOCK
+         ========================================================================= -->
+    <nav class="bottom-nav" id="bottomNavDock" style="display: none;">
+      <button type="button" class="nav-item-btn active" id="navBtnHome" onclick="HealthChefApp.navigateToTab('tabHome')">
+        <span class="nav-icon">🏠</span>
+        <span>Home</span>
+      </button>
+      <button type="button" class="nav-item-btn" id="navBtnRecipes" onclick="HealthChefApp.navigateToTab('tabRecipes')">
+        <span class="nav-icon">🍳</span>
+        <span>Recipes</span>
+      </button>
+      <button type="button" class="nav-item-btn" id="navBtnTrack" onclick="HealthChefApp.navigateToTab('tabTrack')">
+        <span class="nav-icon">📊</span>
+        <span>Track</span>
+      </button>
+      <button type="button" class="nav-item-btn" id="navBtnPlanner" onclick="HealthChefApp.navigateToTab('tabPlanner')">
+        <span class="nav-icon">📅</span>
+        <span>Planner</span>
+      </button>
+      <button type="button" class="nav-item-btn" id="navBtnNuske" onclick="HealthChefApp.navigateToTab('tabNuske')">
+        <span class="nav-icon">🌿</span>
+        <span>Nuske</span>
+      </button>
+    </nav>
+
+    <!-- =========================================================================
+         MODALS
+         ========================================================================= -->
+
+    <!-- 1. Meal Edit Modal (with Automatic Recalculation on Name Change) -->
+    <div class="modal-overlay" id="modalMealEdit">
+      <div class="modal-sheet">
+        <div class="modal-header">
+          <h3 id="modalMealTitle">Edit Meal Entry</h3>
+          <button type="button" class="btn-close-modal" onclick="HealthChefApp.closeModal('modalMealEdit')">✕</button>
+        </div>
+        <div class="form-group">
+          <label for="editMealDishName">Dish Name (Type any Indian dish to auto-calculate nutrition)</label>
+          <input type="text" id="editMealDishName" oninput="HealthChefApp.onMealNameInputChange(this.value)" placeholder="e.g. Palak Paneer with Missi Roti">
+          <small style="color: var(--accent-green); font-size: 0.78rem; font-weight: 600; display: block; margin-top: 4px;" id="mealAutoCalcStatusNotice">
+            ✨ Auto-calculating calories and macros in real-time...
+          </small>
+        </div>
+        <!-- Live Computed Macros Grid -->
+        <div class="nutrition-grid" style="margin: 14px 0;">
+          <div class="nutri-col">
+            <div class="num" id="modalNutriCal">440</div>
+            <div class="lbl">Calories</div>
+          </div>
+          <div class="nutri-col">
+            <div class="num" id="modalNutriProtein">20g</div>
+            <div class="lbl">Protein</div>
+          </div>
+          <div class="nutri-col">
+            <div class="num" id="modalNutriCarbs">46g</div>
+            <div class="lbl">Carbs</div>
+          </div>
+          <div class="nutri-col">
+            <div class="num" id="modalNutriFat">18g</div>
+            <div class="lbl">Fat</div>
+          </div>
+          <div class="nutri-col">
+            <div class="num" id="modalNutriFiber">8g</div>
+            <div class="lbl">Fiber</div>
+          </div>
+        </div>
+        <button type="button" class="btn-primary" onclick="HealthChefApp.saveMealEdit()">
+          <span>Update Meal & Dashboard Totals</span> ✓
+        </button>
+      </div>
+    </div>
+
+    <!-- 2. Add Medicine Modal (with Dosage, Timings, Meal Relation, Reminders) -->
+    <div class="modal-overlay" id="modalAddMedicine">
+      <div class="modal-sheet">
+        <div class="modal-header">
+          <h3>Add Medication / Supplement</h3>
+          <button type="button" class="btn-close-modal" onclick="HealthChefApp.closeModal('modalAddMedicine')">✕</button>
+        </div>
+        <div class="form-group">
+          <label for="inputMedName">Medicine Name</label>
+          <input type="text" id="inputMedName" placeholder="e.g., Metformin, Telmisartan, Vitamin D3">
+        </div>
+        <div class="filter-row">
+          <div class="filter-col">
+            <label for="inputMedDosage">Dosage (Amount & Unit)</label>
+            <input type="text" id="inputMedDosage" placeholder="e.g., 500 mg, 1 tablet, 10 IU, 2 puffs">
+          </div>
+          <div class="filter-col">
+            <label for="inputMedTiming">Time of Day</label>
+            <select id="inputMedTiming">
+              <option value="Morning">Morning (8:00 AM)</option>
+              <option value="Noon">Noon (1:30 PM)</option>
+              <option value="Night" selected>Night (8:30 PM)</option>
+            </select>
+          </div>
+        </div>
+        <div class="filter-row">
+          <div class="filter-col">
+            <label for="inputMedRelation">Meal Relation</label>
+            <select id="inputMedRelation">
+              <option value="After Food" selected>After Food</option>
+              <option value="Before Food">Before Food</option>
+              <option value="Empty Stomach">Empty Stomach</option>
+              <option value="Any time">Any time</option>
+            </select>
+          </div>
+          <div class="filter-col">
+            <label for="inputMedReminder">Set Audio/Visual Reminder</label>
+            <select id="inputMedReminder">
+              <option value="Enabled" selected>🔔 Enabled (At Schedule)</option>
+              <option value="Disabled">Disabled</option>
+            </select>
+          </div>
+        </div>
+        <button type="button" class="btn-primary" onclick="HealthChefApp.saveNewMedicine()">
+          <span>Save Medication</span> ✓
+        </button>
+      </div>
+    </div>
+
+    <!-- 3. CHEFFIE Voice Assistant Modal -->
+    <div class="modal-overlay" id="modalNutriVoice">
+      <div class="modal-sheet" style="text-align: center;">
+        <div class="modal-header" style="justify-content: flex-end;">
+          <button type="button" class="btn-close-modal" onclick="HealthChefApp.closeNutriVoiceModal()">✕</button>
+        </div>
+        <div class="voice-assistant-orb" id="voiceOrb">🎙️</div>
+        <h3 style="font-size: 1.25rem; margin-bottom: 6px;">CHEFFIE Voice Assistant</h3>
+        <p style="font-size: 0.88rem; color: var(--text-secondary); margin-bottom: 14px;" id="voiceStatusText">
+          Listening... Speak to Cheffie for dietary advice or tracking commands.
+        </p>
+        <div style="background: var(--bg-tertiary); padding: 14px; border-radius: var(--radius-md); font-size: 0.9rem; margin-bottom: 16px; min-height: 54px; text-align: left;" id="voiceTranscriptBox">
+          <span style="color: var(--text-muted);">Transcript will appear here...</span>
+        </div>
+        <div style="display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin-bottom: 16px;">
+          <button type="button" class="btn-secondary" style="font-size: 0.78rem; width: auto; padding: 4px 8px;" onclick="HealthChefApp.simulateVoiceQuery('What should I eat for dinner with high cholesterol?')">
+            "Dinner for cholesterol?"
+          </button>
+          <button type="button" class="btn-secondary" style="font-size: 0.78rem; width: auto; padding: 4px 8px;" onclick="HealthChefApp.simulateVoiceQuery('Log 2 glasses of water')">
+            "Log 2 glasses of water"
+          </button>
+          <button type="button" class="btn-secondary" style="font-size: 0.78rem; width: auto; padding: 4px 8px;" onclick="HealthChefApp.simulateVoiceQuery('Remedy for gas and bloating')">
+            "Remedy for gas?"
+          </button>
+        </div>
+        <button type="button" class="btn-primary" onclick="HealthChefApp.toggleNutriVoiceMic()">
+          <span id="btnVoiceToggleText">Stop Listening</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Toast Notice -->
+    <div class="toast-notice" id="toastNotice">Notification</div>
+
+  </div>
+
+  <!-- Scripts -->
+  <script src="js/data.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
